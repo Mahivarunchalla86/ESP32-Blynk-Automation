@@ -1,0 +1,59 @@
+#define BLYNK_TEMPLATE_ID "TMPL3B2uN1atk"
+#define BLYNK_TEMPLATE_NAME "Quickstart Template"
+#define BLYNK_AUTH_TOKEN "_61IPL-6ACctrkgq_IcuAOcUQLwQQ27u"
+
+#include "BlynkEdgent.h"
+
+// GPIO pin definitions for Relays and Switches
+const int relayPins[] = {23, 22, 21, 19, 18, 5, 25, 26};
+const int switchPins[] = {13, 12, 14, 27, 33, 32, 15, 4};
+const int vPins[] = {V1, V2, V3, V4, V5, V6, V7, V8};
+
+// Relay and Switch States
+bool relayStates[8] = {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW};
+bool switchStates[8] = {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW};
+
+#define wifiLed 2 // LED indicator
+
+BLYNK_CONNECTED() {
+    // Sync all relay states with the Blynk app
+    for (int i = 0; i < 8; i++) {
+        Blynk.syncVirtual(vPins[i]);
+    }
+}
+
+// Function to handle Blynk button presses
+void controlRelay(int index, int value) {
+    relayStates[index] = value;
+    digitalWrite(relayPins[index], value ? LOW : HIGH);
+}
+
+// Blynk Write Functions for all 8 buttons
+BLYNK_WRITE(V1) { controlRelay(0, param.asInt()); }
+BLYNK_WRITE(V2) { controlRelay(1, param.asInt()); }
+BLYNK_WRITE(V3) { controlRelay(2, param.asInt()); }
+BLYNK_WRITE(V4) { controlRelay(3, param.asInt()); }
+BLYNK_WRITE(V5) { controlRelay(4, param.asInt()); }
+BLYNK_WRITE(V6) { controlRelay(5, param.asInt()); }
+BLYNK_WRITE(V7) { controlRelay(6, param.asInt()); }
+BLYNK_WRITE(V8) { controlRelay(7, param.asInt()); }
+
+void setup() {
+    Serial.begin(115200);
+    BlynkEdgent.begin();
+
+    // Set relay pins as outputs
+    for (int i = 0; i < 8; i++) {
+        pinMode(relayPins[i], OUTPUT);
+        digitalWrite(relayPins[i], HIGH); // Default OFF state
+    }
+
+    // Set switch pins as inputs
+    for (int i = 0; i < 8; i++) {
+        pinMode(switchPins[i], INPUT_PULLUP);
+    }
+}
+
+void loop() {
+    BlynkEdgent.run();
+}
